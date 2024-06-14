@@ -1,0 +1,124 @@
+import { NextResponse } from 'next/server';
+import puppeteer from 'puppeteer';
+import fetch from 'node-fetch';
+import { promisify } from 'util';
+import { imageSize } from 'image-size';
+
+type ImageDimensions = {
+  width?: number;
+  height?: number;
+  type?: string;
+};
+
+const sizeOf = promisify<Buffer | string, ImageDimensions>(imageSize);
+
+export async function POST(request: Request) {
+  try {
+    const { query } = await request.json();
+    console.log('From image scraper, Received query:', query);
+
+    if (!query) {
+      return NextResponse.json({ error: 'Place name is required' }, { status: 400 });
+    }
+
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
+    const page = await browser.newPage();
+
+    try {
+      await page.goto(`https://www.google.com/search?q=${encodeURIComponent(query)}&tbm=isch`, {
+        timeout: 30000, // Set a timeout of 30 seconds for page navigation
+      });
+    } catch (error) {
+      console.error('Error navigating to Google Images:', error);
+      throw error;
+    }
+    
+/*     const photos = await page.evaluate(async () => {
+      const results = [];
+      const divElements = document.querySelectorAll('div[role="listitem"]');
+    
+      for (const div of Array.from(divElements)) {
+        const imgElement = div.querySelector('img');
+        if (imgElement) {
+          const src = imgElement.src;
+          if (src) {
+            results.push(src);
+          }
+        }
+      }
+    
+      return results;
+    }); */
+
+    /* const photos = await page.evaluate(() => {
+      return new Promise((resolve) => {
+        const results = [];
+        const divElements = document.querySelectorAll('div[role="listitem"]');
+    
+        for (const div of Array.from(divElements)) {
+          const imgElement = div.querySelector('img');
+          if (imgElement) {
+            const src = imgElement.src;
+            if (src) {
+              results.push(src);
+            }
+          }
+        }
+    
+        resolve(results);
+      });
+    }); */
+    
+    let photos: string[] = [];
+    try {
+      photos = await page.evaluate(() => {
+        const results: string[] = [];
+        const divElements = document.querySelectorAll('div[role="listitem"]');
+
+        for (const div of Array.from(divElements)) {
+          const imgElement = div.querySelector('img');
+          if (imgElement) {
+            const src = imgElement.src;
+            if (src) {
+              results.push(src);
+            }
+          }
+        }
+
+        return results;
+        },
+        { timeout: 30000 } // Set a timeout of 30 seconds for page evaluation
+      );
+    } catch (error) {
+      console.error('Error evaluating page:', error);
+      throw error;
+    }
+
+    await browser.close();
+
+    // Filter images by dimensions of 400px or less
+    const filteredPhotos: string[] = [];
+    for (const photo of photos) {
+      try {
+        const response = await fetch(photo);
+        const arrayBuffer = await response.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        const dimensions = await sizeOf(buffer);
+
+        if (dimensions && dimensions.width && dimensions.width <= 400) {
+          filteredPhotos.push(photo);
+        }
+      } catch (error) {
+        console.error('Error fetching image size:', error);
+      }
+    }
+
+    return NextResponse.json({ photos: filteredPhotos });
+  } catch (error) {
+    console.error('Error fetching images:', error);
+    return NextResponse.json({ error: 'An error occurred while fetching place images' }, { status: 500 });
+  }
+}

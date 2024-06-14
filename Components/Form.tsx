@@ -27,16 +27,64 @@ export default function Form({ userId }: FormProps) {
       setLoading(true);
 
       try {
-        console.log('Generting date ideas.....');
-        const response = await fetch('/api/suggest-date-ideas', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ mood, budget, location, specialNote, userId }),
-        });
-
-        const data: DateIdea[] = await response.json();
+        console.log('Generating date ideas.....');
+        // const response = await fetch('/api/suggest-date-ideas', {
+        //   method: 'POST',
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //   },
+        //   body: JSON.stringify({ mood, budget, location, specialNote, userId }),
+        // });
+  
+        // const data: DateIdea[] = await response.json();
+  
+        // Test data
+        const data: DateIdea[] = [
+          {
+            name: "Go for a Hike - Spend time outdoors on a scenic hike",
+            "date location": "Shenandoah National Park, VA",
+            budget: "$",
+            activities: [
+              {
+                activity: "Scenic Hiking Trail",
+                description: "Explore one of the picturesque hiking trails in Shenandoah National Pa…"
+              },
+              {
+                activity: "Picnic",
+                description: "Pack a picnic with some sandwiches, snacks, and refreshing drinks to e…"
+              },
+              {
+                activity: "Wildlife Spotting",
+                description: "Keep an eye out for local wildlife such as deer, birds, and maybe even…"
+              }
+            ],
+            cost_breakdown: [
+              {
+                item: "Park Entrance Fee",
+                description: "Estimated cost per vehicle for entry into Shenandoah National Park."
+              },
+              {
+                item: "Picnic Supplies",
+                description: "Cost of food and drinks for your picnic during the hike."
+              },
+              {
+                item: "Optional Souvenirs",
+                description: "Budget for any optional souvenirs or gifts available at the park's vis…"
+              }
+            ],
+            tips: [
+              {
+                tip: "Check the Weather: Make sure to dress appropriately and check the weat…"
+              },
+              {
+                tip: "Bring Water: Stay hydrated during your hike by carrying an ample suppl…"
+              },
+              {
+                tip: "Respect Nature: Leave no trace, respect wildlife, and follow park guid…"
+              }
+            ],
+          }
+        ];
 
         console.log('Getting Images for the date ideas.....');
         const dateIdeasWithPhotos = await Promise.all(
@@ -48,7 +96,7 @@ export default function Form({ userId }: FormProps) {
             const locationName = dateLocation.split(',')[0].trim();
         
             if (locationName === 'At Home' || locationName === 'Your Backyard' || locationName === 'Your Home') {
-              const findImage = await fetch('/api/serp-image-search', {
+              const findImage = await fetch('/api/image-search', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -63,7 +111,7 @@ export default function Form({ userId }: FormProps) {
         
               website = 'No website available';
             } else {
-              const findPlace = await fetch('/api/get-place-images', {
+              /* const findPlace = await fetch('/api/get-place-images', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -77,7 +125,7 @@ export default function Form({ userId }: FormProps) {
               }
               if (placeData.website) {
                 website = placeData.website;
-              }
+              } */
         
               const findImage = await fetch('/api/image-search', {
                 method: 'POST',
