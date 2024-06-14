@@ -8,6 +8,7 @@ export async function POST(request: Request) {
       engine: 'google_images',
       q: query,
       api_key: process.env.SERPAPI_API_KEY,
+      tbs: 'isz:m' // Filter for medium-sized images
     };
 
     const data = await getJson(params);

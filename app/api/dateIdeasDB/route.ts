@@ -54,7 +54,10 @@ export async function GET(request: Request) {
         const ideas = await dateIdeas.find({ userId }).toArray();
         console.log('Retrieved ideas:', ideas);
 
-        return NextResponse.json(ideas, { status: 200 });
+        // Reverse the order of the ideas
+        const reversedIdeas = ideas.reverse();
+
+        return NextResponse.json(reversedIdeas, { status: 200 });
     } catch (error) {
         console.error('Error retrieving ideas:', error);
         return NextResponse.json({ error: 'Error retrieving ideas' }, { status: 500 });

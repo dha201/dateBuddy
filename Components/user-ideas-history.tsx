@@ -95,41 +95,40 @@ export default function HistoryMenu({ userId }: UserIdeasProps) {
   }
 
   return (
-    <div className="absolute top-0 left-0 m-4">
-
-    <div className="relative w-full max-w-xs">
-      <button
-        onClick={() => setDropdownOpen(!dropdownOpen)}
-        className="w-full bg-gradient-to-br from-purple-951 via-black to-violet-900 border text-white px-4 py-2 border border-gray-300 rounded shadow-sm flex justify-between items-center"
-      >
-        Select an item
-        <svg
-          className={`w-5 h-5 transition-transform ${dropdownOpen ? 'transform rotate-180' : ''}`}
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+    <div className="fixed top-0 left-0 m-4 z-50"> {/* Updated to fixed position */}
+      <div className="relative w-full max-w-md"> {/* Increased max-width */}
+        <button
+          onClick={() => setDropdownOpen(!dropdownOpen)}
+          className="w-full bg-gradient-to-br from-purple-951 via-black to-violet-900 text-white px-4 py-2 border border-gray-300 rounded shadow-sm flex justify-between items-center"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-      {dropdownOpen && (
-        <div className="absolute w-full rounded-b shadow-lg z-10 bg-black" style={{ height: 'calc(100vh - 10%)' }}>
-          <ul className="bg-gradient-to-br from-purple-951 via-black to-violet-900 border border-gray-300 rounded-b gradient-border p-1 overflow-y-auto h-full">
-            {dateIdeas.map((idea, index) => (
-              <li
-                key={index}
-                onClick={() => handleSelect(idea)}
-                className="px-4 py-2 mb-2 text-white hover:bg-gray-100 cursor-pointer flex flex-col items-center text-center gradient-border-item"
-              >
-                <span className="font-semibold">{idea.name}</span>
-                <span className="text-sm text-gray-400">{idea['date location']}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
+          Your Previous Date Ideas 
+          <svg
+            className={`w-5 h-5 transition-transform ${dropdownOpen ? 'transform rotate-180' : ''}`}
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        {dropdownOpen && (
+          <div className="absolute w-full rounded-b shadow-lg z-10 bg-black" style={{ height: 'calc(100vh - 10%)' }}>
+            <ul className="bg-gradient-to-br from-purple-951 via-black to-violet-900 border border-gray-300 rounded-b gradient-border p-1 overflow-y-auto h-full">
+              {dateIdeas.map((idea, index) => (
+                <li
+                  key={index}
+                  onClick={() => handleSelect(idea)}
+                  className="px-4 py-2 mb-2 text-white hover:bg-black cursor-pointer flex flex-col items-center text-center gradient-border-item"
+                >
+                  <span className="font-semibold">{idea.name}</span>
+                  <span className="text-sm text-gray-400">{idea['date location']}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
 
       {isModalOpen && selectedIdea && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-custom-gradient bg-opacity-75">

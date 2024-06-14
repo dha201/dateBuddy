@@ -28,25 +28,73 @@ export default function Form({ userId }: FormProps) {
 
       try {
         console.log('Generating date ideas.....');
-        const response = await fetch('/api/suggest-date-ideas', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ mood, budget, location, specialNote, userId }),
-        });
-
-        const data: DateIdea[] = await response.json();
+        // const response = await fetch('/api/suggest-date-ideas', {
+        //   method: 'POST',
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //   },
+        //   body: JSON.stringify({ mood, budget, location, specialNote, userId }),
+        // });
+  
+        // const data: DateIdea[] = await response.json();
+  
+        // Test data
+        const data: DateIdea[] = [
+          {
+            name: "scenic hike", //Go for a Hike, Spend time outdoors on a 
+            "date location": "Shenandoah National Park, VA",
+            budget: "$",
+            activities: [
+              {
+                activity: "Scenic Hiking Trail",
+                description: "Explore one of the picturesque hiking trails in Shenandoah National Pa…"
+              },
+              {
+                activity: "Picnic",
+                description: "Pack a picnic with some sandwiches, snacks, and refreshing drinks to e…"
+              },
+              {
+                activity: "Wildlife Spotting",
+                description: "Keep an eye out for local wildlife such as deer, birds, and maybe even…"
+              }
+            ],
+            cost_breakdown: [
+              {
+                item: "Park Entrance Fee",
+                description: "Estimated cost per vehicle for entry into Shenandoah National Park."
+              },
+              {
+                item: "Picnic Supplies",
+                description: "Cost of food and drinks for your picnic during the hike."
+              },
+              {
+                item: "Optional Souvenirs",
+                description: "Budget for any optional souvenirs or gifts available at the park's vis…"
+              }
+            ],
+            tips: [
+              {
+                tip: "Check the Weather: Make sure to dress appropriately and check the weat…"
+              },
+              {
+                tip: "Bring Water: Stay hydrated during your hike by carrying an ample suppl…"
+              },
+              {
+                tip: "Respect Nature: Leave no trace, respect wildlife, and follow park guid…"
+              }
+            ],
+          }
+        ];
 
         console.log('Getting Images for the date ideas.....');
         const dateIdeasWithPhotos = await Promise.all(
           data.map(async (dateIdea: DateIdea) => {
             let photos: string[] = [];
             let website: string = 'No website available';
-
+        
             const { 'date location': dateLocation, name } = dateIdea;
             const locationName = dateLocation.split(',')[0].trim();
-
+        
             if (locationName === 'At Home' || locationName === 'Your Backyard' || locationName === 'Your Home') {
               const findImage = await fetch('/api/image-search', {
                 method: 'POST',
@@ -55,30 +103,30 @@ export default function Form({ userId }: FormProps) {
                 },
                 body: JSON.stringify({ query: `${name} For Couple` }),
               });
-
+        
               const imageData = await findImage.json();
               if (imageData.thumbnails && imageData.thumbnails.length > 0) {
                 photos = imageData.thumbnails;
               }
-
+        
               website = 'No website available';
             } else {
-              const findPlace = await fetch('/api/get-place-images', {
+              /* const findPlace = await fetch('/api/get-place-images', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ placeName: dateLocation }),
               });
-
+        
               const placeData = await findPlace.json();
               if (placeData.photos && placeData.photos.length > 0) {
                 photos = placeData.photos;
               }
               if (placeData.website) {
                 website = placeData.website;
-              }
-
+              } */
+        
               const findImage = await fetch('/api/image-search', {
                 method: 'POST',
                 headers: {
@@ -86,20 +134,17 @@ export default function Form({ userId }: FormProps) {
                 },
                 body: JSON.stringify({ query: `${name} For Couple` }),
               });
-
+        
               const imageData = await findImage.json();
               if (imageData.thumbnails && imageData.thumbnails.length > 0) {
                 photos = [...photos, ...imageData.thumbnails];
               }
             }
-
-            // Shuffle the photos array
-            photos = shuffleArray(photos);
-
+        
             return { ...dateIdea, photos, website };
           })
         );
-
+        
         // Make a POST request to save the generated date ideas with photos and website
         console.log('Posting date ideas to the database.....');
         const storeIdeas = await fetch('/api/dateIdeasDB', {
@@ -123,15 +168,6 @@ export default function Form({ userId }: FormProps) {
       alert('Please select mood, budget, and location');
     }
   };
-
-  // Fisher-Yates shuffle algorithm
-  function shuffleArray(array: string[]): string[] {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-  }
 
   return (
     <div className="flex flex-col h-screen">
@@ -180,8 +216,8 @@ export default function Form({ userId }: FormProps) {
           >
             <option value="">--Choose a budget--</option>
             <option value="$">$ (0 - $50)</option>
-            <option value="$">$ ($50 - $200)</option>
-            <option value="$$">$$ (above $200)</option>
+            <option value="$$">$$ ($50 - $200)</option>
+            <option value="$$$">$$$ (above $200)</option>
           </select>
         </div>
 

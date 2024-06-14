@@ -69,6 +69,7 @@ export default function ShowPage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-14">
       <ProfileIcon userId={userId} />
+      <HistoryMenu userId={userId} />
       <h2 className="mt-8 pb-8 text-4xl font-bold text-white">
         Your Date Ideas
       </h2>
@@ -92,7 +93,6 @@ export default function ShowPage() {
       ) : (
         <p className="text-white">No date ideas available.</p>
       )}
-      <HistoryMenu userId={userId} />
     </main>
   );
 }

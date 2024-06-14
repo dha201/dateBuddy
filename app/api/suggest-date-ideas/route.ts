@@ -35,13 +35,11 @@ const dateIdeasJSON: Record<string, string[]> = {
     "Play Mini-Golf - Navigate your way around the holes at a mini-golf course.",
     "Go Shopping - Browse through vintage shops, buy vinyl on Record Store Day, and explore art galleries or specialty shops.",
     "Do Sunday Brunch - A brunch date is always a good idea, and a brunch double date is twice as fun.",
-    "Tailgate - Mingle with your fellow football fans.",
     "Visit Your Local Farmer's Market - Pick up fresh produce to cook a delicious meal together.",
     "Visit the Zoo or Aquarium - Marvel at the exhibits and learn about your favorite animals together.",
     "Rent a Convertible - The perfect spring date idea, go cruising through scenic parkways and rural back roads to celebrate the change in season.",
     "Go Horseback Riding - Ride off into the sunset together on horseback.",
     "Take a Road Trip - Plan a road trip together and explore new places.",
-    "Hop on the Alphabet Date Idea Trend - Add some order to your date night planning by working your way through alphabet date ideas.",
     "Go to an Arcade - Love the nostalgia of old-school arcade games, or, an immersive virtual reality video game experience? There are lots of options to try.",
 
   ],
@@ -127,55 +125,50 @@ export async function POST(req: Request) {
 
         const previousDateIdeas: any[] = [];
 
-        const systemMessages = [
-            `This is a chat interface to suggest detailed date ideas based on the mood, budget, and location you provide. Please follow the instructions below to receive a date idea suggestion in JSON format.
-
-            Context:
-            You are Date GPT, an AI specialized in suggesting date ideas tailored to the user's location and budget.
-            Your goal is to consider geographical and cultural context, as well as financial constraints, to offer personalized and feasible date suggestions.
-            Avoid recommending anything that might be unsafe, inappropriate, or culturally insensitive.
-            Communicate in a friendly, engaging manner, making the process of finding date ideas enjoyable and easy.
-            Budget classifications are as follows: $ represents $0-$50, $$ represents $50-$200, and $$$ represents $200+ (This is for you to analyze, but MAKE SURE to include an accurate estimate of the date's budget with your response).
-            Mood classifications are as follows: Adventurous: Activities that involve excitement, exploration, and a bit of thrill. 
-            Romantic: Activities that foster intimacy, connection, and a romantic atmosphere.
-            Relaxed: Activities that are laid-back, stress-free, and help in unwinding. 
-            If the date is at home, AlWAYS include 'At Home, [city]' and DO NOT response with 'Home', 'home', 'Your Home' . Otherwise, ALWAYS DOUBLE CHECK if you provide an accurate and detailed location for the date and MAKE SURE to provide the key place in 'date location' for example response with date location: 'Potomac River, Washington, D.C.' and NOT date location: 'Washington, D.C.'.
-            ALWAYS MAKE SURE to double check with your previous responses to ensure no duplication in the suggestions.
-
-            If the Idea is within the list below. 
-              "At-Home": [
-                "Have a Backyard Campout - Set up a tent and camp out in the backyard.",
-                "Make Homemade Pizza - Spend the night making and baking pizzas.",
-                "Do a Home Improvement Project - Work on improving something in your home.",
-                "Create a DIY Craft - Make something creative together.",
-                "Make a Vision Board - Create vision boards for your goals and dreams.",
-                "Have a Karaoke Night - Sing your favorite songs with a karaoke session.",
-                "Do a Workout Together - Exercise together with a workout video.",
-                "Have a Game Night - Play video games or board games together.",
-                "Try a Virtual Experience - Explore a virtual museum or take a virtual tour.",
-                "Cook Together - Spend the night making a meal from scratch.",
-                "Plan a Wine Tasting Night - Have a cozy evening with your favorite wines.",
-                "Have a Spa Night - Set up a spa night with massages and relaxation.",
-                "Play a Board Game - Have fun with classic board games or try a new one.",
-                "Create a Scrapbook - Put together a scrapbook of your favorite memories.",
-                "Host a Movie Marathon - Watch a series of your favorite movies.",
-                "Do a Puzzle Together - Work together on a challenging puzzle.",
-                "Try a New Recipe - Experiment with cooking a new dish.",
-                "Read Together - Enjoy reading a book or articles together.",
-                "Write Each Other Letters - Write love letters to each other and read them aloud.",
-                "Have a Backyard Campout - Set up a tent and camp out in the backyard.",
-              ]
-              NEVER NEVER NEVER include anything related to 'Living room' or 'Backyard' or 'Kitchen' in the 'date location' field. ONLY include 'At Home' in the 'date location' along with the city name.
-              And ALWAYS include at home in the 'name' field along with the date idea name. For example, "name": "At Home, Have a Backyard Campout".
-              `
-        ];
-
         const generateDateIdea = async (randomIdea: string, budget: string, location: string, specialNote: string) => {
-            const selectedSystemMessage = systemMessages[Math.floor(Math.random() * systemMessages.length)];
+
             const messages: OpenAI.ChatCompletionMessageParam[] = [
                 {
                     role: 'system',
-                    content: selectedSystemMessage
+                    content: `
+                            Context:
+                            You are Date GPT, an AI specialized in suggesting date ideas tailored to the user's location and budget.
+                            Your goal is to consider geographical and cultural context, as well as financial constraints, to offer personalized and feasible date suggestions.
+                            Avoid recommending anything that might be unsafe, inappropriate, or culturally insensitive.
+                            Communicate in a friendly, engaging manner, making the process of finding date ideas enjoyable and easy.
+                            Budget classifications are as follows: $ represents $0-$50, $$ represents $50-$200, and $$$ represents $200+ (This is for you to analyze, but MAKE SURE to include an accurate estimate of the date's budget with your response).
+                            Mood classifications are as follows: Adventurous: Activities that involve excitement, exploration, and a bit of thrill. 
+                            Romantic: Activities that foster intimacy, connection, and a romantic atmosphere.
+                            Relaxed: Activities that are laid-back, stress-free, and help in unwinding. 
+                            If the date is at home, AlWAYS include 'At Home, [city]' and DO NOT response with 'Home', 'home', 'Your Home' . Otherwise, ALWAYS DOUBLE CHECK if you provide an accurate and detailed location for the date and MAKE SURE to provide the key place in 'date location' for example response with date location: 'Potomac River, Washington, D.C.' and NOT date location: 'Washington, D.C.'.
+                            ALWAYS MAKE SURE to double check with your previous responses to ensure no duplication in the suggestions.
+
+                            If the Idea is within the list below. 
+                              "At-Home": [
+                                "Have a Backyard Campout - Set up a tent and camp out in the backyard.",
+                                "Make Homemade Pizza - Spend the night making and baking pizzas.",
+                                "Do a Home Improvement Project - Work on improving something in your home.",
+                                "Create a DIY Craft - Make something creative together.",
+                                "Make a Vision Board - Create vision boards for your goals and dreams.",
+                                "Have a Karaoke Night - Sing your favorite songs with a karaoke session.",
+                                "Do a Workout Together - Exercise together with a workout video.",
+                                "Have a Game Night - Play video games or board games together.",
+                                "Try a Virtual Experience - Explore a virtual museum or take a virtual tour.",
+                                "Cook Together - Spend the night making a meal from scratch.",
+                                "Plan a Wine Tasting Night - Have a cozy evening with your favorite wines.",
+                                "Have a Spa Night - Set up a spa night with massages and relaxation.",
+                                "Play a Board Game - Have fun with classic board games or try a new one.",
+                                "Create a Scrapbook - Put together a scrapbook of your favorite memories.",
+                                "Host a Movie Marathon - Watch a series of your favorite movies.",
+                                "Do a Puzzle Together - Work together on a challenging puzzle.",
+                                "Try a New Recipe - Experiment with cooking a new dish.",
+                                "Read Together - Enjoy reading a book or articles together.",
+                                "Write Each Other Letters - Write love letters to each other and read them aloud.",
+                                "Have a Backyard Campout - Set up a tent and camp out in the backyard.",
+                              ]
+                              NEVER NEVER NEVER include anything related to 'Living room' or 'Backyard' or 'Kitchen' in the 'date location' field. ONLY include 'At Home' in the 'date location' along with the city name.
+                              And ALWAYS include at home in the 'name' field along with the date idea name. For example, "name": "At Home, Have a Backyard Campout".
+                              `
                 },
                 {
                     role: 'user',
@@ -257,7 +250,7 @@ export async function POST(req: Request) {
             ];
 
             const response = await openai.chat.completions.create({
-                model: 'gpt-3.5-turbo-0125',
+                model: 'gpt-4o',
                 messages: messages,
                 temperature: 0.7,
             });
@@ -287,7 +280,7 @@ export async function POST(req: Request) {
           ];
         
           const response = await openai.chat.completions.create({
-            model: 'gpt-3.5-turbo-0125',
+            model: 'gpt-4o',
             messages: messages,
             max_tokens: 5,
             n: 1,
@@ -309,6 +302,7 @@ export async function POST(req: Request) {
         while (dateIdeas.length < 6) {
             const selectedIdeas = dateIdeasJSON[mood] || [];
             const randomIdea = selectedIdeas[Math.floor(Math.random() * selectedIdeas.length)];
+            console.log('Selected Idea:', randomIdea);
 
             const idea = await generateDateIdea(randomIdea, budget, location, specialNote);
             const locationName = idea['date location'].split(',')[0].trim();
