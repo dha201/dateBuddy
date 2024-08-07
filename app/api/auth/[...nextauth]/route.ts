@@ -18,7 +18,7 @@ export const NextAuthOptions = {
         async redirect({ baseUrl }: { baseUrl: string }) {
             // Always redirect to home page after sign-in
             return `${baseUrl}/home`;
-        }
+        },
     }
 };
 
